@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Toy Haven Hot Wheels style diecast car collection">
+  <title>Support | Toy Haven</title>
+  <link rel="icon" href="images/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="index.html">TOY HAVEN</a>
+    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Cars</a></li>
+        <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+        <li><a href="wishlist.html">Collection</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="section">
+  <div class="container">
+    <h1>Feedback & Support</h1>
+
+    <form id="feedbackForm">
+      <div class="form-row">
+        <label for="feedbackName">Name</label>
+        <input id="feedbackName" required>
+        <div class="error" id="feedbackNameError"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="feedbackEmail">Email</label>
+        <input id="feedbackEmail" type="email" required>
+        <div class="error" id="feedbackEmailError"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="feedbackMessage">Message</label>
+        <textarea id="feedbackMessage" required></textarea>
+        <div class="error" id="feedbackMessageError"></div>
+      </div>
+
+      <button class="button" type="submit">Send Feedback</button>
+    </form>
+
+    <br>
+    <div id="feedbackSuccess"></div>
+
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <button class="faq-question">Are these real cars?</button>
+      <div class="faq-answer">No. Toy Haven is a student front-end demo for collectible diecast cars.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Does checkout take real money?</button>
+      <div class="faq-answer">No. The checkout is only a simulation and does not connect to a payment service.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question">Where is my collection saved?</button>
+      <div class="faq-answer">The collection is saved in your browser using localStorage.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h3>Toy Haven</h3>
+      <p>A simple online collection of Hot Wheels style diecast cars.</p>
+      <p>© <span id="year"></span> Toy Haven</p>
+    </div>
+    <div>
+      <h3>Pages</h3>
+      <p><a href="products.html">Cars</a></p>
+      <p><a href="wishlist.html">Collection</a></p>
+      <p><a href="support.html">Support</a></p>
+    </div>
+    <div>
+      <h3>Newsletter</h3>
+      <form id="newsletterForm">
+        <label for="newsletterEmail">Email</label>
+        <input id="newsletterEmail" type="email" required placeholder="you@example.com">
+        <br><br>
+        <button class="button yellow" type="submit">Subscribe</button>
+      </form>
+      <p id="newsletterMessage"></p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+
+document.getElementById("feedbackForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("feedbackName").value.trim();
+  const email = document.getElementById("feedbackEmail").value.trim();
+  const message = document.getElementById("feedbackMessage").value.trim();
+
+  document.getElementById("feedbackNameError").textContent = "";
+  document.getElementById("feedbackEmailError").textContent = "";
+  document.getElementById("feedbackMessageError").textContent = "";
+
+  let valid = true;
+
+  if (name.length < 2) {
+    document.getElementById("feedbackNameError").textContent = "Please enter your name.";
+    valid = false;
+  }
+
+  if (!email.includes("@")) {
+    document.getElementById("feedbackEmailError").textContent = "Please enter a valid email.";
+    valid = false;
+  }
+
+  if (message.length < 5) {
+    document.getElementById("feedbackMessageError").textContent = "Please enter a message.";
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  const feedback = { name: name, email: email, message: message, date: new Date().toLocaleString() };
+  const savedFeedback = JSON.parse(localStorage.getItem("toyHavenFeedback")) || [];
+  savedFeedback.push(feedback);
+  localStorage.setItem("toyHavenFeedback", JSON.stringify(savedFeedback));
+
+  document.getElementById("feedbackSuccess").innerHTML =
+    '<div class="success">Thanks for your feedback!</div>';
+
+  this.reset();
+});
+
+// FAQ accordion.
+const questions = document.querySelectorAll(".faq-question");
+
+questions.forEach(function(question) {
+  question.addEventListener("click", function() {
+    const answer = this.nextElementSibling;
+    answer.classList.toggle("show");
+  });
+});
+
+</script>
+</body>
+</html>

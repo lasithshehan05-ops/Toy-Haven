@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Toy Haven Hot Wheels style diecast car collection">
+  <title>Home | Toy Haven</title>
+  <link rel="icon" href="images/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="index.html">TOY HAVEN</a>
+    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Cars</a></li>
+        <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+        <li><a href="wishlist.html">Collection</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="hero">
+  <div class="container hero-content">
+    <div>
+      <p>TOY HAVEN • DIECAST COLLECTION</p>
+      <h1 id="bannerTitle">Small Cars. Big Fun.</h1>
+      <p id="bannerText">Explore a simple collection of Hot Wheels style cars for collectors and fans.</p>
+      <a class="button" href="products.html">Shop the Cars</a>
+    </div>
+    <img id="bannerImage" src="https://titantoyz.com/cdn/shop/files/BMW1.webp?v=1758934246&width=1445" alt="Red Hot Wheels style diecast car">
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Featured Product of the Day</h2>
+    <div id="featuredProduct" class="card"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Why Toy Haven?</h2>
+    <div class="cards">
+      <article class="card reveal"><div class="card-body"><h3>Easy Browsing</h3><p>Find a car quickly using simple search and category filters.</p></div></article>
+      <article class="card reveal"><div class="card-body"><h3>Build a Collection</h3><p>Save interesting cars and mark them as interested or owned.</p></div></article>
+      <article class="card reveal"><div class="card-body"><h3>Simple Checkout</h3><p>Use the demo checkout form to practise front-end interactions.</p></div></article>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h3>Toy Haven</h3>
+      <p>A simple online collection of Hot Wheels style diecast cars.</p>
+      <p>© <span id="year"></span> Toy Haven</p>
+    </div>
+    <div>
+      <h3>Pages</h3>
+      <p><a href="products.html">Cars</a></p>
+      <p><a href="wishlist.html">Collection</a></p>
+      <p><a href="support.html">Support</a></p>
+    </div>
+    <div>
+      <h3>Newsletter</h3>
+      <form id="newsletterForm">
+        <label for="newsletterEmail">Email</label>
+        <input id="newsletterEmail" type="email" required placeholder="you@example.com">
+        <br><br>
+        <button class="button yellow" type="submit">Subscribe</button>
+      </form>
+      <p id="newsletterMessage"></p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+
+// Rotating hero banner. It changes every few seconds.
+const banners = [
+  { title: "Small Cars. Big Fun.", text: "Explore a simple collection of Hot Wheels style cars.", image: "https://titantoyz.com/cdn/shop/files/BMW1.webp?v=1758934246&width=1445" },
+  { title: "Race Into Your Collection.", text: "Find red racers, blue speedsters and more.", image: "https://collectiblepilot.com/assets/images/products/hot-wheels-1967-camaro-diecast-car/hot-wheels-1967-camaro-diecast-car-1.webp" },
+  { title: "Collect Your Favourite.", text: "Save cars to your personal Toy Haven collection.", image: "https://i.ebayimg.com/images/g/hAEAAOSw45pmgdYF/s-l1200.jpg" }
+];
+
+let bannerIndex = 0;
+
+function changeBanner() {
+  bannerIndex++;
+  if (bannerIndex >= banners.length) bannerIndex = 0;
+
+  document.getElementById("bannerTitle").textContent = banners[bannerIndex].title;
+  document.getElementById("bannerText").textContent = banners[bannerIndex].text;
+  document.getElementById("bannerImage").src = banners[bannerIndex].image;
+}
+
+setInterval(changeBanner, 4000);
+
+// Featured Product of the Day uses the current day.
+const today = new Date().getDate();
+const featured = products[today % products.length];
+
+document.getElementById("featuredProduct").innerHTML = `
+  <img class="product-image" src="${featured.image}" alt="${featured.name}">
+  <div class="card-body">
+    <h3>${featured.name}</h3>
+    <p>${featured.description}</p>
+    <p class="price">$${featured.price.toFixed(2)}</p>
+    <button class="button" onclick="addToCart(${featured.id})">Add to Cart</button>
+  </div>
+`;
+
+// Newsletter is stored in localStorage.
+document.getElementById("newsletterForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+  const email = document.getElementById("newsletterEmail").value;
+  localStorage.setItem("toyHavenNewsletter", email);
+  document.getElementById("newsletterMessage").textContent = "Thanks! You are subscribed.";
+  this.reset();
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Toy Haven Hot Wheels style diecast car collection">
+  <title>Checkout | Toy Haven</title>
+  <link rel="icon" href="images/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="index.html">TOY HAVEN</a>
+    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Cars</a></li>
+        <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+        <li><a href="wishlist.html">Collection</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="section">
+  <div class="container">
+    <h1>Checkout</h1>
+    <p>This is a front-end demo checkout. No real payment is taken.</p>
+
+    <div class="summary">
+      <h2>Order Summary</h2>
+      <div id="orderSummary"></div>
+      <p><strong>Final Total: $<span id="checkoutTotal">0.00</span></strong></p>
+    </div>
+
+    <br>
+
+    <form id="checkoutForm">
+      <div class="form-row">
+        <label for="fullName">Full Name</label>
+        <input id="fullName" required>
+        <div class="error" id="nameError"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="email">Email</label>
+        <input id="email" type="email" required>
+        <div class="error" id="emailError"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="address">Delivery Address</label>
+        <textarea id="address" required></textarea>
+        <div class="error" id="addressError"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="payment">Payment Method</label>
+        <select id="payment">
+          <option>Card</option>
+          <option>Cash on Delivery</option>
+        </select>
+      </div>
+
+      <button class="button" type="submit">Confirm Order</button>
+    </form>
+
+    <div id="checkoutMessage"></div>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h3>Toy Haven</h3>
+      <p>A simple online collection of Hot Wheels style diecast cars.</p>
+      <p>© <span id="year"></span> Toy Haven</p>
+    </div>
+    <div>
+      <h3>Pages</h3>
+      <p><a href="products.html">Cars</a></p>
+      <p><a href="wishlist.html">Collection</a></p>
+      <p><a href="support.html">Support</a></p>
+    </div>
+    <div>
+      <h3>Newsletter</h3>
+      <form id="newsletterForm">
+        <label for="newsletterEmail">Email</label>
+        <input id="newsletterEmail" type="email" required placeholder="you@example.com">
+        <br><br>
+        <button class="button yellow" type="submit">Subscribe</button>
+      </form>
+      <p id="newsletterMessage"></p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+
+function displayOrderSummary() {
+  const cart = getCart();
+  const summary = document.getElementById("orderSummary");
+  let total = 0;
+
+  summary.innerHTML = "";
+
+  cart.forEach(item => {
+    const product = getProduct(item.id);
+    const subtotal = product.price * item.quantity;
+    total += subtotal;
+
+    const p = document.createElement("p");
+    p.textContent = product.name + " × " + item.quantity + " = $" + subtotal.toFixed(2);
+    summary.appendChild(p);
+  });
+
+  document.getElementById("checkoutTotal").textContent = total.toFixed(2);
+  return total;
+}
+
+document.getElementById("checkoutForm").addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  // Clear previous validation messages.
+  document.getElementById("nameError").textContent = "";
+  document.getElementById("emailError").textContent = "";
+  document.getElementById("addressError").textContent = "";
+
+  const name = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const address = document.getElementById("address").value.trim();
+  const cart = getCart();
+
+  let valid = true;
+
+  if (name.length < 2) {
+    document.getElementById("nameError").textContent = "Please enter your full name.";
+    valid = false;
+  }
+
+  if (!email.includes("@")) {
+    document.getElementById("emailError").textContent = "Please enter a valid email.";
+    valid = false;
+  }
+
+  if (address.length < 5) {
+    document.getElementById("addressError").textContent = "Please enter a delivery address.";
+    valid = false;
+  }
+
+  if (cart.length === 0) {
+    alert("Your cart is empty.");
+    valid = false;
+  }
+
+  if (!valid) return;
+
+  const order = {
+    name: name,
+    email: email,
+    address: address,
+    payment: document.getElementById("payment").value,
+    total: displayOrderSummary(),
+    date: new Date().toLocaleString()
+  };
+
+  // Store the order history in localStorage.
+  const history = JSON.parse(localStorage.getItem("toyHavenOrders")) || [];
+  history.push(order);
+  localStorage.setItem("toyHavenOrders", JSON.stringify(history));
+
+  // Clear the cart after successful checkout.
+  localStorage.removeItem("toyHavenCart");
+
+  document.getElementById("checkoutMessage").innerHTML =
+    '<div class="success success-animation"><strong>Order confirmed!</strong><br>Thank you for your Toy Haven order.</div>';
+
+  this.reset();
+  displayOrderSummary();
+  updateCartCount();
+});
+
+displayOrderSummary();
+
+</script>
+</body>
+</html>

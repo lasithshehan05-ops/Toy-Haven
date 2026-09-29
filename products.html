@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Toy Haven Hot Wheels style diecast car collection">
+  <title>Cars | Toy Haven</title>
+  <link rel="icon" href="images/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="index.html">TOY HAVEN</a>
+    <button class="menu-button" id="menuButton" aria-label="Open menu"></button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Cars</a></li>
+        <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+        <li><a href="wishlist.html">Collection</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="section">
+  <div class="container">
+    <h1>Hot Wheels Cars</h1>
+    <p>Browse our small diecast collection. Click a product for more details.</p>
+
+    <div class="filters">
+      <input id="searchInput" type="search" placeholder="Search by car name">
+      <select id="categoryFilter">
+        <option value="All">All Categories</option>
+        <option value="Diecast Cars">Diecast Cars</option>
+      </select>
+    </div>
+
+    <div id="productGrid" class="cards"></div>
+  </div>
+</section>
+
+<div class="modal" id="productModal" aria-hidden="true">
+  <div class="modal-box">
+    <button class="close" id="closeModal" aria-label="Close"></button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+</main>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h3>Toy Haven</h3>
+      <p>A simple online collection of Hot Wheels style diecast cars.</p>
+      <p> <span id="year"></span> Toy Haven</p>
+    </div>
+    <div>
+      <h3>Pages</h3>
+      <p><a href="products.html">Cars</a></p>
+      <p><a href="wishlist.html">Collection</a></p>
+      <p><a href="support.html">Support</a></p>
+    </div>
+    <div>
+      <h3>Newsletter</h3>
+      <form id="newsletterForm">
+        <label for="newsletterEmail">Email</label>
+        <input id="newsletterEmail" type="email" required placeholder="you@example.com">
+        <br><br>
+        <button class="button yellow" type="submit">Subscribe</button>
+      </form>
+      <p id="newsletterMessage"></p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+
+const grid = document.getElementById("productGrid");
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const modal = document.getElementById("productModal");
+const modalContent = document.getElementById("modalContent");
+
+function showProducts() {
+  const search = searchInput.value.toLowerCase();
+  const category = categoryFilter.value;
+
+  grid.innerHTML = "";
+
+  products.forEach(product => {
+    const matchesName = product.name.toLowerCase().includes(search);
+    const matchesCategory = category === "All" || product.category === category;
+
+    if (matchesName && matchesCategory) {
+      const card = document.createElement("article");
+      card.className = "card reveal";
+      card.innerHTML = `
+        <img class="product-image" src="${product.image}" alt="${product.name}">
+        <div class="card-body">
+          <h3>${product.name}</h3>
+          <p>${product.category}</p>
+          <p class="price">$${product.price.toFixed(2)}</p>
+          <button class="button" onclick="addToCart(${product.id})">Add to Cart</button>
+          <button class="button secondary" onclick="openProduct(${product.id})">Details</button>
+          <button class="button yellow" onclick="addToWishlist(${product.id})">Wishlist</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+  });
+
+  if (grid.innerHTML === "") {
+    grid.innerHTML = "<p>No cars found.</p>";
+  }
+
+  setupReveal();
+}
+
+function openProduct(id) {
+  const product = getProduct(id);
+  modalContent.innerHTML = `
+    <img class="product-image" src="${product.image}" alt="${product.name}">
+    <h2>${product.name}</h2>
+    <p>${product.description}</p>
+    <p>Category: ${product.category}</p>
+    <p class="price">$${product.price.toFixed(2)}</p>
+    <button class="button" onclick="addToCart(${product.id})">Add to Cart</button>
+  `;
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+document.getElementById("closeModal").addEventListener("click", function() {
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden", "true");
+});
+
+modal.addEventListener("click", function(event) {
+  if (event.target === modal) {
+    modal.classList.remove("show");
+  }
+});
+
+searchInput.addEventListener("input", showProducts);
+categoryFilter.addEventListener("change", showProducts);
+
+showProducts();
+
+// Save a product to the wishlist.
+function addToWishlist(id) {
+  const list = JSON.parse(localStorage.getItem("toyHavenWishlist")) || [];
+  if (!list.some(item => item.id === id)) {
+    list.push({ id: id, status: "Interested" });
+    localStorage.setItem("toyHavenWishlist", JSON.stringify(list));
+    alert("Car added to your collection!");
+  } else {
+    alert("This car is already in your collection.");
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Toy Haven Hot Wheels style diecast car collection">
+  <title>Cart | Toy Haven</title>
+  <link rel="icon" href="images/favicon.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="container navbar">
+    <a class="logo" href="index.html">TOY HAVEN</a>
+    <button class="menu-button" id="menuButton" aria-label="Open menu">☰</button>
+    <nav aria-label="Main navigation">
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="products.html">Cars</a></li>
+        <li><a href="cart.html">Cart (<span id="cartCount">0</span>)</a></li>
+        <li><a href="wishlist.html">Collection</a></li>
+        <li><a href="checkout.html">Checkout</a></li>
+        <li><a href="support.html">Support</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+<main>
+
+<section class="section">
+  <div class="container">
+    <h1>Your Shopping Cart</h1>
+    <div id="cartItems"></div>
+    <div class="summary">
+      <h2>Cart Summary</h2>
+      <p>Total: <strong>$<span id="cartTotal">0.00</span></strong></p>
+      <button class="button secondary" id="clearCart">Clear Cart</button>
+      <a class="button" href="checkout.html">Proceed to Checkout</a>
+    </div>
+  </div>
+</section>
+
+</main>
+<footer>
+  <div class="container footer-grid">
+    <div>
+      <h3>Toy Haven</h3>
+      <p>A simple online collection of Hot Wheels style diecast cars.</p>
+      <p>© <span id="year"></span> Toy Haven</p>
+    </div>
+    <div>
+      <h3>Pages</h3>
+      <p><a href="products.html">Cars</a></p>
+      <p><a href="wishlist.html">Collection</a></p>
+      <p><a href="support.html">Support</a></p>
+    </div>
+    <div>
+      <h3>Newsletter</h3>
+      <form id="newsletterForm">
+        <label for="newsletterEmail">Email</label>
+        <input id="newsletterEmail" type="email" required placeholder="you@example.com">
+        <br><br>
+        <button class="button yellow" type="submit">Subscribe</button>
+      </form>
+      <p id="newsletterMessage"></p>
+    </div>
+  </div>
+</footer>
+<script src="script.js"></script>
+<script>
+
+const cartItems = document.getElementById("cartItems");
+const cartTotal = document.getElementById("cartTotal");
+
+function displayCart() {
+  const cart = getCart();
+  cartItems.innerHTML = "";
+  let total = 0;
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = "<p>Your cart is empty.</p>";
+  }
+
+  cart.forEach(item => {
+    const product = getProduct(item.id);
+    const subtotal = product.price * item.quantity;
+    total += subtotal;
+
+    const row = document.createElement("div");
+    row.className = "cart-row";
+    row.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <div>
+        <h3>${product.name}</h3>
+        <p>$${product.price.toFixed(2)} each</p>
+      </div>
+      <div class="qty-controls">
+        <button onclick="changeQuantity(${product.id}, -1)">−</button>
+        <span>${item.quantity}</span>
+        <button onclick="changeQuantity(${product.id}, 1)">+</button>
+      </div>
+      <strong>$${subtotal.toFixed(2)}</strong>
+    `;
+    cartItems.appendChild(row);
+  });
+
+  cartTotal.textContent = total.toFixed(2);
+  updateCartCount();
+}
+
+function changeQuantity(id, amount) {
+  const cart = getCart();
+  const item = cart.find(product => product.id === id);
+
+  if (item) {
+    item.quantity += amount;
+    if (item.quantity <= 0) {
+      const index = cart.indexOf(item);
+      cart.splice(index, 1);
+    }
+  }
+
+  saveCart(cart);
+  displayCart();
+}
+
+document.getElementById("clearCart").addEventListener("click", function() {
+  localStorage.removeItem("toyHavenCart");
+  displayCart();
+});
+
+displayCart();
+
+</script>
+</body>
+</html>
